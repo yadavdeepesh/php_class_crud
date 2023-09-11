@@ -48,9 +48,113 @@ class Database{
 
     }
     // update data to database
-
+    public function update($table,$params=array(),$where=null){
+        if($this->tableExists($table)){
+        $args = array();
+        foreach($params as $key => $value){
+            $args[] = "$key = '$value'";
+        }
+        // convert array to string
+       $argsStr = implode(', ',$args);
+       $sql = "UPDATE $table SET ".$argsStr;
+        // echo $sql; 
+        if($where!=null){
+            $sql .= " where $where";
+        }
+        // echo "<br>";
+        // echo $sql;
+        if($this->mysqli->query($sql)){
+            array_push($this->result,$this->mysqli->affected_rows);
+            return true;
+        }
+        else{
+            array_push($this->result,$this->mysqli->error);
+            return false;
+        }
+        }
+        else{
+        return false;
+        }
+    }   
     // delete data to database
+
+    public function delete($table,$where = null){
+        if($this->tableExists($table)){
+            $sql  = "DELETE FROM $table";
+            if($where != null){
+                $sql .= " where $where";
+                
+               $userExist = "Select * FROM $table where $where";
+            //    echo $userExist;
+             $userNumber =$this->mysqli->query($userExist);
+            }
+            // echo"<br> sql = ". $sql ."<br>";
+            if($userNumber->num_rows == 1){
+            if($this->mysqli->query($sql)){
+                array_push($this->result,$this->mysqli->affected_rows);
+                return true;
+            }
+            else{
+                array_push($this->result,$this->mysqli->error);
+                return false;
+            }
+         }
+         else{
+            array_push($this->result,$where."User Not Exists");
+            return false;
+         }
+        }     
+        else{
+            return false;
+        }
+    }
     // select data to database
+
+  public function sql($sql){
+    $query = $this ->mysqli->query($sql);
+    if($query)
+    {
+        $this->result = $query->fetch_all(MYSQLI_ASSOC);
+        return true;
+    }
+    else{
+        array_push($this->result,$this->mysqli->error);
+        return false;
+    }
+
+  }
+
+
+  //select data to database
+
+  public function select($table ,$rows="*",$join = null ,$where = null,$order =null ,$limit =null){
+    if($this ->tableExists($table)){
+        $sql = "SELECT $rows FROM $table";
+        if($join != null){
+            $sql .= " JOIN $join";
+        }
+        if($where != null){
+            $sql .= " where $where";
+        }
+        if($order != null){
+            $sql .= " ORDER BY $order";
+        }
+        if($limit != null){
+            $sql .= " limit 0, $limit";
+        }
+        echo "SQL = > ".$sql;
+        $query = $this ->mysqli->query($sql);
+        if($query)
+        {
+            $this->result = $query->fetch_all(MYSQLI_ASSOC);
+            return true;
+        }
+        else{
+            array_push($this->result,$this->mysqli->error);
+            return false;
+        }
+    }
+  }
 
     // create function to check the given table is exits or not..
 
