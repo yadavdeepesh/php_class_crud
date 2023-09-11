@@ -7,6 +7,6 @@ echo "Inserted Result is ::";
 echo "<br>";
 print_r($obj->getResult());
 
-// next functionality is update";
+// next functionality is updated";
 
 ?>
